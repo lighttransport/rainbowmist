@@ -5,6 +5,13 @@ project(UnitTests)
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
 find_package(Sanitizers) # Address sanitizer.
 
+if (NOT IS_DIRECTORY "${CMAKE_SOURCE_DIR}/../third_party/Catch/include")
+  message(FATAL_ERROR "RainbowMist dependency repositories (Catch, etc.) are missing! "
+      "You probably did not clone the project with --recursive. It is possible to recover "
+      "by calling \"git submodule update --init --recursive\"")
+endif()
+
+
 # Add custom build type DebugOpt
 if (MSVC)
 set(CMAKE_CXX_FLAGS_DEBUGOPT
