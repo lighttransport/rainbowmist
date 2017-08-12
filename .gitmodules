@@ -1,0 +1,6 @@
+[submodule "third_party/glm"]
+	path = third_party/glm
+	url = https://github.com/g-truc/glm
+[submodule "third_party/Catch"]
+	path = third_party/Catch
+	url = https://github.com/philsquared/Catch.git

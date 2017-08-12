@@ -1,0 +1,9 @@
+
+# ignore build files
+/build*
+/inst*
+
+
+build*/
+
+dist/
