@@ -91,6 +91,8 @@ add_library(clew
 
 include_directories(
     ${CMAKE_SOURCE_DIR}
+    ${CMAKE_SOURCE_DIR}/../
+    ${CMAKE_SOURCE_DIR}/../third_party/glm/
     ${CMAKE_SOURCE_DIR}/cuew/include
     ${CMAKE_SOURCE_DIR}/EasyCL
     ${CMAKE_SOURCE_DIR}/../third_party/Catch/include/
@@ -126,7 +128,7 @@ else()
     endif ()
 endif()
 
-set(EXTRA_LIBS ${EXTRA_LIBS} cuew EasyCL)
+set(EXTRA_LIBS ${EXTRA_LIBS} EasyCL clew cuew)
 
-target_link_libraries(unit_test ${CMAKE_THREAD_LIBS_INIT} ${CMAKE_DL_LIBS} ${EXTRA_LIBS})
+target_link_libraries(unit_test ${EXTRA_LIBS} ${CMAKE_THREAD_LIBS_INIT} ${CMAKE_DL_LIBS})
 add_sanitizers(unit_test)

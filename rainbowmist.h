@@ -48,7 +48,9 @@ THE SOFTWARE.
 #define vcross(a, b) cross(a, b)
 #define vdot(a, b) dot(a, b)
 
-#elif defined(OPENCL)
+
+#elif defined(OPENCL)  // NOTE(LTE): Application must pass `-D OPENCL` as a OpenCL compile flags.
+
 // We only support OpenCL 1.2
 
 #define RAINBOWMIST_OPENCL (1)
@@ -322,6 +324,7 @@ typedef real4<double> double4;
 
 #define KERNEL 
 #define DEVICE 
+#define GLOBAL 
 #define SHARED ERROR
 
 

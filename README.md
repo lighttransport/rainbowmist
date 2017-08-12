@@ -44,6 +44,7 @@ $ cmake --build .
 
 ## Third party licenses
 
+* helper_math.h : Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
 * glm : Happy Bunny License (Modified MIT) or the MIT License
 * Catch : 
 * EasyCL

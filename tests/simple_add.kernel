@@ -1,0 +1,6 @@
+#include "rainbowmist.h"
+
+KERNEL void simple_add_float2(GLOBAL float2 *ret, GLOBAL const float2 *a, GLOBAL const float2 *b)
+{
+  ret[0] = a[0] + b[0];
+}
