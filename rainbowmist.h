@@ -33,16 +33,20 @@ THE SOFTWARE.
 
 #define RAINBOWMIST_CUDA (1)
 
-#include <float.h> // import FLT_EPSILON
+//#include <float.h> // import FLT_EPSILON
+
+#ifndef FLT_EPSILON
+#define FLT_EPSILON (0x1.0p-23f)
+#endif
 
 // From CUDA SDK samples
 #include "helper_math.h"
 
 #define DEVICE __device__
 #define HOST   __host__
-#define GLOBAL __global__
-#define LOCAL  __local__
-#define KERNEL __device__
+#define GLOBAL 
+#define LOCAL 
+#define KERNEL extern "C" __global__
 
 #define vnormalize(x) normalize(x)
 #define vcross(a, b) cross(a, b)
