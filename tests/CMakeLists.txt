@@ -63,6 +63,9 @@ find_package(Sanitizers)
 # Threads
 find_package(Threads)
 
+# [CLCudaAPI]
+include_directories("${CMAKE_SOURCE_DIR}/CLCudaAPI/include")
+
 # [EasyCL]
 set(USE_CLEW On)
 add_definitions(-DUSE_CLEW)

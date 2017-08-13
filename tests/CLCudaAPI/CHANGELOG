@@ -1,0 +1,64 @@
+
+Version 8.0 (2016-09-27):
+- Several minor fixes
+- Added new methods to the API:
+  * GetAllPlatforms
+  * A new constructor for the Program class based on a binary or IR string (both OpenCL and CUDA)
+
+Version 7.0 (2016-08-03):
+- Re-wrote the OpenCL event implementation with proper memory management
+- Updated some return types of device-query information to fix issues on 32-bit systems
+- Updated the API documentation
+- Refactored some functions to reduce the amount of code
+- Added new methods to the API:
+  * Kernel::GetFunctionName
+
+Version 6.0 (2016-06-29):
+- Added the possibility to use Event pointers, adjusted the Kernel::Launch function to do so
+- Added a new constructor for Program based on a binary (OpenCL only)
+- Fixed a bug when OpenCL 2.0 or newer is installed but the device doesn't support it
+- Added new methods to the API:
+  * Device::VersionNumber (integer version of the string-getter Device::Version)
+  * Device::IsCPU, Device::IsGPU, Device::IsAMD, Device::IsNVIDIA, Device::IsIntel, Device::IsARM
+
+Version 5.0 (2016-04-21):
+- Buffers can now also be 'not owned' to disable automatic memory freeing afterwards
+- Made 'Buffer::Read' and 'Buffer::ReadAsync' constant methods
+- Added new methods to the API:
+  * Event::WaitForCompletion (OpenCL only)
+  * Kernel::Launch (version with OpenCL waiting list)
+
+Version 4.0 (2015-11-01):
+- Made 'CopyTo' and 'CopyToAsync' constant methods
+- Added offset support to the Buffer class (credits go to 'ielhelw')
+- Added unit tests for {Event, Device, Context, Queue} classes
+- Added compact OpenCL example
+- Fixed compiler warnings and errors for Windows using MSVC
+- Fixed several general compiler warnings
+- Added new methods to the API:
+  * Device::MaxAllocSize
+
+Version 3.0 (2015-09-04):
+- Renamed the project from 'Claduc' into 'CLCudaAPI'
+- SetArgument now takes both l-value and r-value arguments
+- Added first version of a test infrastructure
+- Added new methods to the API:
+  * Platform::NumDevices
+  * Buffer::Buffer (a constructor with default read-write access)
+  * Buffer::Buffer (a constructor filled with data from C++ start/end iterators)
+  * Kernel::Launch (version with default OpenCL workgroup size)
+
+Version 2.0 (2015-07-13):
+- Allows device program string to be moved into Program at construction
+- Cleaned-up device-information methods
+- Added new methods to the API:
+  * Device::CoreClock
+  * Device::ComputeUnits
+  * Device::MemorySize
+  * Device::MemoryClock
+  * Device::MemoryBusWidth
+  * Program::GetIR
+  * Kernel::SetArguments
+
+Version 1.0 (2015-07-09):
+- Initial version
