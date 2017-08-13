@@ -1,10 +1,22 @@
-# RainbowMist, header only OpenCL/CUDA/C++11 single compute kernel description utility.
+# RainbowMist 🌈🌫️, header only OpenCL/CUDA/C++11 single compute kernel description utility.
 
-RainbowMist is a simple macro and template based single compute kernel.
+RainbowMist 🌈🌫️ is a simple macro and template based single compute kernel.
 
 ## Status
 
-Experimenal.
+**Experimenal**.
+
+## Supported OSes
+
+* Winwows 7 64bit or later(32bit not supported). 
+* Ubuntu 16.04 or later(32bit not supported). 
+* macOS 10.12. 
+
+## Supported platforms
+
+* CUDA 8.0(7.0 or 7.5 may work but not tested)
+* OpenCL 1.2
+* C++11 compiler
 
 ## Advantages
 
@@ -35,11 +47,21 @@ $ git submodule update --init
 
 Requires CMake 3.1 or later.
 
+
 ```
 $ cd tests
 $ cmake -Bbuild -H.
 $ cd build
 $ cmake --build .
+```
+
+### Windows
+
+Tested on Visual Studio 2015 or later.
+
+```
+$ cd tests
+$ cmake -Bbuild -H. -G "Visual Studio 14 2015 Win64"
 ```
 
 ## Third party licenses

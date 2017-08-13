@@ -106,6 +106,20 @@ int main(int argc, char **argv)
     int ret = cuewInit();
     if (ret == CUEW_SUCCESS) {
       hasCUDA = true;
+
+      printf("NVCC path    : %s\n", cuewCompilerPath());
+      printf("NVCC version : %s\n", cuewCompilerVersion());
+
+      if (nvrtcVersion) {
+        int major, minor;
+        nvrtcVersion(&major, &minor);
+        std::cout << "NVRTC version : " << major << "." << minor << std::endl;
+      }
+      else {
+        // Guess in 32bit mode. NVRTC is not available on Windows/Linux 32bit.
+        std::cerr << "NVRTC not available.";
+        exit(-1123);
+      }
     }
   }
 
