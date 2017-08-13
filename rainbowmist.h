@@ -68,6 +68,7 @@ THE SOFTWARE.
 #define sqrtf(x) sqrt(x)
 #define fabsf(x) fabs(x)
 
+#if !defined(__APPLE__)
 static inline float2 make_float2(float a, float b)
 {
   return (float2)(a, b);
@@ -82,6 +83,7 @@ static inline float4 make_float4(float a, float b, float c, float d)
 {
   return (float4)(a, b, c, d);
 }
+#endif
 
 #else // C++
 
@@ -322,7 +324,7 @@ typedef real4<double> double4;
 // NOTE(LTE): Liminatation
 // - No shared variable support
 
-#define KERNEL 
+#define KERNEL static
 #define DEVICE 
 #define GLOBAL 
 #define SHARED ERROR
