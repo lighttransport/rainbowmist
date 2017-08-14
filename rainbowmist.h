@@ -141,7 +141,16 @@ static inline vec4 make_vec4(float a, float b, float c, float d)
 #include "glm/glm.hpp"
 #include "glm/geometric.hpp"
 
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wheader-hygiene"
+#endif
+
 using namespace glm;
+
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
 
 #else // !RAINBOWMIST_USE_GLM
 
