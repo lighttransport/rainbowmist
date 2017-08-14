@@ -128,7 +128,15 @@ static inline vec4 make_vec4(float a, float b, float c, float d)
 #include <cfloat>
 #include <cmath>
 
+#ifndef RAINBOWMIST_USE_GLM
+#define RAINBOWMIST_USE_GLM (1)
+#endif
+
 #ifdef RAINBOWMIST_USE_GLM
+
+#ifndef GLM_FORCE_SWIZZLE
+#define GLM_FORCE_SWIZZLE
+#endif
 
 #include "glm/glm.hpp"
 #include "glm/geometric.hpp"
