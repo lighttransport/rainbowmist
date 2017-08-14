@@ -197,6 +197,17 @@ int main(int argc, char **argv)
         std::cerr << "NVRTC not available.";
         exit(-1123);
       }
+
+      // check if actual CUDA device is available.
+      int num_devices = 0;
+      cuDeviceGetCount(&num_devices);
+      std::cout << "# of CUDA devices : " << num_devices << std::endl;
+
+      if (num_devices == 0) {
+        std::cerr << "CUDA capable device not available." << std::endl;
+        cuda_exclude_opt = strdup("exclude:[cuda]");
+        local_argv.push_back(cuda_exclude_opt);
+      }
     } else {
       std::cerr << "CUDA not available." << std::endl;
       cuda_exclude_opt = strdup("exclude:[cuda]");
