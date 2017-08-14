@@ -64,6 +64,10 @@ $ cd tests
 $ cmake -Bbuild -H. -G "Visual Studio 14 2015 Win64"
 ```
 
+## TODO
+
+* [ ] OpenGL GLSL compute shader?
+
 ## Third party licenses
 
 * helper_math.h : Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.

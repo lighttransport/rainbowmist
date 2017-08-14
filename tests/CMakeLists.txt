@@ -63,6 +63,12 @@ find_package(Sanitizers)
 # Threads
 find_package(Threads)
 
+# [glm]
+include_directories("${CMAKE_SOURCE_DIR}/../third_party/glm/include")
+
+# [CxxSwizzle]
+include_directories("${CMAKE_SOURCE_DIR}/../third_party/CxxSwizzle/include")
+
 # [CLCudaAPI]
 include_directories("${CMAKE_SOURCE_DIR}/CLCudaAPI/include")
 
@@ -133,6 +139,11 @@ add_executable ( unit_test
 if (MSVC)
     target_compile_options(unit_test PRIVATE /W4)
 else()
+    if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+        message(STATU ${CMAKE_CXX_COMPILER_ID})
+        target_compile_options(unit_test PRIVATE -fno-operator-names)
+    endif ()
+
     if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
         target_compile_options(unit_test PRIVATE -Weverything -Werror -Wno-padded -Wno-c++98-compat-pedantic -Wno-documentation)
     endif ()

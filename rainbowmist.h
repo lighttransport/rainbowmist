@@ -33,6 +33,19 @@ THE SOFTWARE.
 
 #define RAINBOWMIST_CUDA (1)
 
+// Use glm for vector swizzle.
+#ifndef GLM_FORCE_SWIZZLE
+#define GLM_FORCE_SWIZZLE
+#endif
+
+#ifndef GLM_FORCE_CUDA
+#define GLM_FORCE_CUDA
+#endif
+
+#include "glm/glm.hpp"
+
+using namespace glm;
+
 //#include <float.h> // import FLT_EPSILON
 
 #ifndef FLT_EPSILON
@@ -52,6 +65,20 @@ THE SOFTWARE.
 #define vcross(a, b) cross(a, b)
 #define vdot(a, b) dot(a, b)
 
+static inline vec2 make_vec2(float a, float b)
+{
+  return vec2(a, b);
+}
+
+static inline vec3 make_vec3(float a, float b, float c)
+{
+  return vec3(a, b, c);
+}
+
+static inline vec4 make_vec4(float a, float b, float c, float d)
+{
+  return vec4(a, b, c, d);
+}
 
 #elif defined(OPENCL)  // NOTE(LTE): Application must pass `-D OPENCL` as a OpenCL compile flags.
 
@@ -59,6 +86,7 @@ THE SOFTWARE.
 
 #define RAINBOWMIST_OPENCL (1)
 
+#define DEVICE 
 #define KERNEL __kernel
 #define GLOBAL __global
 #define LOCAL  __local
@@ -72,18 +100,22 @@ THE SOFTWARE.
 #define sqrtf(x) sqrt(x)
 #define fabsf(x) fabs(x)
 
+typedef float2 vec2;
+typedef float3 vec3;
+typedef float4 vec4;
+
 #if !defined(__APPLE__)
-static inline float2 make_float2(float a, float b)
+static inline vec2 make_vec2(float a, float b)
 {
-  return (float2)(a, b);
+  return (vec2)(a, b);
 }
 
-static inline float3 make_float3(float a, float b, float c)
+static inline vec3 make_vec3(float a, float b, float c)
 {
   return (float3)(a, b, c);
 }
 
-static inline float4 make_float4(float a, float b, float c, float d)
+static inline vec4 make_vec4(float a, float b, float c, float d)
 {
   return (float4)(a, b, c, d);
 }
@@ -101,9 +133,7 @@ static inline float4 make_float4(float a, float b, float c, float d)
 #include "glm/glm.hpp"
 #include "glm/geometric.hpp"
 
-typedef glm::vec2 float2;
-typedef glm::vec3 float3;
-typedef glm::vec4 float4;
+using namespace glm;
 
 #else // !RAINBOWMIST_USE_GLM
 
@@ -121,9 +151,9 @@ typedef glm::vec4 float4;
 #pragma clang diagnostic pop
 #endif
 
-typedef swizzle::glsl::vector<float, 2> float2;
-typedef swizzle::glsl::vector<float, 3> float3;
-typedef swizzle::glsl::vector<float, 4> float4;
+typedef swizzle::glsl::vector<float, 2> vec2;
+typedef swizzle::glsl::vector<float, 3> vec3;
+typedef swizzle::glsl::vector<float, 4> vec4;
 
 // ----------------------------------------------------
 #endif // RAINBOWMIST_USE_GLM
@@ -142,26 +172,26 @@ typedef swizzle::glsl::vector<float, 4> float4;
 #define SHARED ERROR
 
 
-static inline float2 make_float2(float a, float b)
+static inline vec2 make_vec2(float a, float b)
 {
-  float2 ret;
+  vec2 ret;
   ret.x = a;
   ret.y = b;
   return ret;
 }
 
-static inline float3 make_float3(float a, float b, float c)
+static inline vec3 make_vec3(float a, float b, float c)
 {
-  float3 ret;
+  vec3 ret;
   ret.x = a;
   ret.y = b;
   ret.z = c;
   return ret;
 }
 
-static inline float4 make_float4(float a, float b, float c, float d)
+static inline vec4 make_vec4(float a, float b, float c, float d)
 {
-  float4 ret;
+  vec4 ret;
   ret.x = a;
   ret.y = b;
   ret.z = c;

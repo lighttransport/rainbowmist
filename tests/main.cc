@@ -106,7 +106,7 @@ TEST_CASE("CUDA initialize", "[cuda][!mayfail]")
   auto dev_b = CLCudaAPI::Buffer<float>(context, queue, b, b + 2);
   auto dev_ret = CLCudaAPI::Buffer<float>(context, queue, ret, ret + 2);
 
-  auto kernel = CLCudaAPI::Kernel(program, "simple_add_float2");
+  auto kernel = CLCudaAPI::Kernel(program, "simple_add_vec2");
   kernel.SetArgument(0, dev_ret);
   kernel.SetArgument(1, dev_a);
   kernel.SetArgument(2, dev_b);
@@ -127,10 +127,10 @@ TEST_CASE("CUDA initialize", "[cuda][!mayfail]")
 
 // -----------------------------------------------
 
-TEST_CASE("OCL simple add float2", "[opencl]")
+TEST_CASE("OCL simple add vec2", "[opencl]")
 {
   EasyCL *cl = EasyCL::createForFirstGpu();
-  CLKernel *kernel = cl->buildKernel("../simple_add.kernel", "simple_add_float2", kOpenCLCompileOptions);
+  CLKernel *kernel = cl->buildKernel("../simple_add.kernel", "simple_add_vec2", kOpenCLCompileOptions);
   REQUIRE(kernel != nullptr);
 
   float ret[2];
@@ -154,15 +154,15 @@ TEST_CASE("OCL simple add float2", "[opencl]")
 
 // -----------------------------------------------
 
-TEST_CASE("simple add float2", "[cpp11]")
+TEST_CASE("simple add vec2", "[cpp11]")
 {
-  float2 ret;
-  float2 a, b;
+  vec2 ret;
+  vec2 a, b;
 
-  a = make_float2(1, 2.1f);
-  b = make_float2(3, 4.5f);
+  a = make_vec2(1, 2.1f);
+  b = make_vec2(3, 4.5f);
 
-  simple_add_float2(&ret, &a, &b);
+  simple_add_vec2(&ret, &a, &b);
 
   REQUIRE( ret.x == Approx(4) );
   REQUIRE( ret.y == Approx(6.6f) );
