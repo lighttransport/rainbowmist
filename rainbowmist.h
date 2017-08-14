@@ -96,9 +96,6 @@ static inline float4 make_float4(float a, float b, float c, float d)
 #include <cfloat>
 #include <cmath>
 
-// TODO(LTE): Remove glm dependency
-#define RAINBOWMIST_USE_GLM (1)
-
 #ifdef RAINBOWMIST_USE_GLM
 
 #include "glm/glm.hpp"
@@ -108,222 +105,33 @@ typedef glm::vec2 float2;
 typedef glm::vec3 float3;
 typedef glm::vec4 float4;
 
-#define vnormalize(x) normalize(x)
-#define vcross(a, b) cross(a, b)
-#define vdot(a, b) dot(a, b)
+#else // !RAINBOWMIST_USE_GLM
 
-#else
+// Use CxxSwizzle.
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wignored-qualifiers"
+#endif
 
-// ----------------------------------------------------
-template <typename T = float>
-class real2 {
- public:
-  real2() {}
-  real2(T x) {
-    v[0] = x;
-    v[1] = x;
-  }
-  real2(T xx, T yy) {
-    v[0] = xx;
-    v[1] = yy;
-  }
-  explicit real2(const T *p) {
-    v[0] = p[0];
-    v[1] = p[1];
-  }
+#include "swizzle/glsl/scalar_support.h"
+#include "swizzle/glsl/vector.h"
+#include "swizzle/glsl/vector_functions.h"
 
-  inline T x() const { return v[0]; }
-  inline T y() const { return v[1]; }
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
 
-  real2 operator*(T f) const { return real2(x() * f, y() * f); }
-  real2 operator-(const real2 &f2) const {
-    return real3(x() - f2.x(), y() - f2.y());
-  }
-  real2 operator*(const real2 &f2) const {
-    return real3(x() * f2.x(), y() * f2.y());
-  }
-  real2 operator+(const real2 &f2) const {
-    return real3(x() + f2.x(), y() + f2.y());
-  }
-  real2 &operator+=(const real2 &f2) {
-    v[0] += f2.x();
-    v[1] += f2.y();
-    return (*this);
-  }
-  real2 operator/(const real2 &f2) const {
-    return real3(x() / f2.x(), y() / f2.y());
-  }
-  real2 operator-() const {
-    return real2(-x(), -y());
-  }
-  T operator[](int i) const { return v[i]; }
-  T &operator[](int i) { return v[i]; }
-
-  T v[2];
-  // T pad[2];  // for alignment(when T = float)
-};
-
-template <typename T = float>
-class real3 {
- public:
-  real3() {}
-  real3(T x) {
-    v[0] = x;
-    v[1] = x;
-    v[2] = x;
-  }
-  real3(T xx, T yy, T zz) {
-    v[0] = xx;
-    v[1] = yy;
-    v[2] = zz;
-  }
-  explicit real3(const T *p) {
-    v[0] = p[0];
-    v[1] = p[1];
-    v[2] = p[2];
-  }
-
-  inline T x() const { return v[0]; }
-  inline T y() const { return v[1]; }
-  inline T z() const { return v[2]; }
-
-  real3 operator*(T f) const { return real3(x() * f, y() * f, z() * f); }
-  real3 operator-(const real3 &f2) const {
-    return real3(x() - f2.x(), y() - f2.y(), z() - f2.z());
-  }
-  real3 operator*(const real3 &f2) const {
-    return real3(x() * f2.x(), y() * f2.y(), z() * f2.z());
-  }
-  real3 operator+(const real3 &f2) const {
-    return real3(x() + f2.x(), y() + f2.y(), z() + f2.z());
-  }
-  real3 &operator+=(const real3 &f2) {
-    v[0] += f2.x();
-    v[1] += f2.y();
-    v[2] += f2.z();
-    return (*this);
-  }
-  real3 operator/(const real3 &f2) const {
-    return real3(x() / f2.x(), y() / f2.y(), z() / f2.z());
-  }
-  real3 operator-() const {
-    return real3(-x(), -y(), -z());
-  }
-  T operator[](int i) const { return v[i]; }
-  T &operator[](int i) { return v[i]; }
-
-  T v[3];
-  // T pad;  // for alignment(when T = float)
-};
-
-template <typename T>
-inline real3<T> operator*(T f, const real3<T> &v) {
-  return real3<T>(v.x() * f, v.y() * f, v.z() * f);
-}
-
-template <typename T>
-inline real3<T> vneg(const real3<T> &rhs) {
-  return real3<T>(-rhs.x(), -rhs.y(), -rhs.z());
-}
-
-template <typename T>
-inline T vlength(const real3<T> &rhs) {
-  return std::sqrt(rhs.x() * rhs.x() + rhs.y() * rhs.y() + rhs.z() * rhs.z());
-}
-
-template <typename T>
-inline real3<T> vnormalize(const real3<T> &rhs) {
-  real3<T> v = rhs;
-  T len = vlength(rhs);
-  if (fabs(len) > 1.0e-6f) {
-    float inv_len = 1.0f / len;
-    v.v[0] *= inv_len;
-    v.v[1] *= inv_len;
-    v.v[2] *= inv_len;
-  }
-  return v;
-}
-
-template <typename T>
-inline real3<T> vcross(real3<T> a, real3<T> b) {
-  real3<T> c;
-  c[0] = a[1] * b[2] - a[2] * b[1];
-  c[1] = a[2] * b[0] - a[0] * b[2];
-  c[2] = a[0] * b[1] - a[1] * b[0];
-  return c;
-}
-
-template <typename T>
-inline T vdot(real3<T> a, real3<T> b) {
-  return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
-}
-
-template <typename T = float>
-class real4 {
- public:
-  real4() {}
-  real4(T x) {
-    v[0] = x;
-    v[1] = x;
-    v[2] = x;
-    v[3] = x;
-  }
-  real4(T xx, T yy, T zz, T ww) {
-    v[0] = xx;
-    v[1] = yy;
-    v[2] = zz;
-    v[3] = ww;
-  }
-  explicit real4(const T *p) {
-    v[0] = p[0];
-    v[1] = p[1];
-    v[2] = p[2];
-    v[3] = p[3];
-  }
-
-  inline T x() const { return v[0]; }
-  inline T y() const { return v[1]; }
-  inline T z() const { return v[2]; }
-  inline T w() const { return v[3]; }
-
-  real4 operator*(T f) const { return real4(x() * f, y() * f, z() * f, w() * f); }
-  real4 operator-(const real4 &f2) const {
-    return real4(x() - f2.x(), y() - f2.y(), z() - f2.z(), w() - f2.w());
-  }
-  real4 operator*(const real4 &f2) const {
-    return real4(x() * f2.x(), y() * f2.y(), z() * f2.z(), w() * f2.w());
-  }
-  real4 operator+(const real4 &f2) const {
-    return real4(x() + f2.x(), y() + f2.y(), z() + f2.z(), w() + f2.w());
-  }
-  real4 &operator+=(const real4 &f2) {
-    v[0] += f2.x();
-    v[1] += f2.y();
-    v[2] += f2.z();
-    v[3] += f2.w();
-    return (*this);
-  }
-  real4 operator/(const real4 &f2) const {
-    return real4(x() / f2.x(), y() / f2.y(), z() / f2.z(), w() / f2.w());
-  }
-  real4 operator-() const {
-    return real4(-x(), -y(), -z(), -w());
-  }
-  T operator[](int i) const { return v[i]; }
-  T &operator[](int i) { return v[i]; }
-
-  T v[4];
-};
-
-typedef real2<float> float2;
-typedef real3<float> float3;
-typedef real4<float> float4;
-typedef real2<double> double2;
-typedef real3<double> double3;
-typedef real4<double> double4;
+typedef swizzle::glsl::vector<float, 2> float2;
+typedef swizzle::glsl::vector<float, 3> float3;
+typedef swizzle::glsl::vector<float, 4> float4;
 
 // ----------------------------------------------------
 #endif // RAINBOWMIST_USE_GLM
+
+// TODO(LTE): Implement more stuff.
+#define vnormalize(x) normalize(x)
+#define vcross(a, b) cross(a, b)
+#define vdot(a, b) dot(a, b)
 
 // NOTE(LTE): Liminatation
 // - No shared variable support
@@ -336,17 +144,29 @@ typedef real4<double> double4;
 
 static inline float2 make_float2(float a, float b)
 {
-  return float2(a, b);
+  float2 ret;
+  ret.x = a;
+  ret.y = b;
+  return ret;
 }
 
 static inline float3 make_float3(float a, float b, float c)
 {
-  return float3(a, b, c);
+  float3 ret;
+  ret.x = a;
+  ret.y = b;
+  ret.z = c;
+  return ret;
 }
 
 static inline float4 make_float4(float a, float b, float c, float d)
 {
-  return float4(a, b, c, d);
+  float4 ret;
+  ret.x = a;
+  ret.y = b;
+  ret.z = c;
+  ret.w = d;
+  return ret;
 }
 
 #endif 

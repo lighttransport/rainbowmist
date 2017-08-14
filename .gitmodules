@@ -4,3 +4,6 @@
 [submodule "third_party/Catch"]
 	path = third_party/Catch
 	url = https://github.com/philsquared/Catch.git
+[submodule "third_party/CxxSwizzle"]
+	path = third_party/CxxSwizzle
+	url = https://github.com/gwiazdorrr/CxxSwizzle.git
