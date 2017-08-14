@@ -4,11 +4,33 @@
 #define CATCH_CONFIG_RUNNER
 #include "catch.hpp"
 
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wreserved-id-macro"
+#pragma clang diagnostic ignored "-Wundef"
+#pragma clang diagnostic ignored "-Wunused-parameter"
+#pragma clang diagnostic ignored "-Wmissing-noreturn"
+#pragma clang diagnostic ignored "-Wshadow-field-in-constructor"
+#pragma clang diagnostic ignored "-Wsign-conversion"
+#pragma clang diagnostic ignored "-Wshorten-64-to-32"
+#pragma clang diagnostic ignored "-Wfloat-conversion"
+#pragma clang diagnostic ignored "-Wweak-vtables"
+#endif
+
 #include "cuew.h"
 
 #include "EasyCL.h"
 
 #include "cupp11.h"
+
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
+
+#ifdef __clang__
+#pragma clang diagnostic ignored "-Wexit-time-destructors"
+#pragma clang diagnostic ignored "-Wundefined-func-template"
+#endif
 
 // ------------
 #include "simple_add.kernel"
@@ -23,7 +45,8 @@ static bool hasOpenCL = false;
 static std::string kOpenCLCompileOptions = "-I ../ -I ../../ -D OPENCL";
 static std::string kCUDACompileOptions = "--include-path=../../";
 
-std::string LoadFile(const std::string &filename)
+#if !defined(__APPLE__)
+static std::string LoadFile(const std::string &filename)
 {
   std::ifstream ifs(filename);
   if (!ifs) {
@@ -100,6 +123,7 @@ TEST_CASE("CUDA initialize", "[cuda][!mayfail]")
   REQUIRE( ret[1] == Approx(6.6) );
 
 }
+#endif
 
 // -----------------------------------------------
 
@@ -113,10 +137,10 @@ TEST_CASE("OCL simple add float2", "[opencl]")
   float a[2], b[2];
 
   a[0] = 1;
-  a[1] = 2.1;
+  a[1] = 2.1f;
 
   b[0] = 3;
-  b[1] = 4.5;
+  b[1] = 4.5f;
 
   kernel->out(2, reinterpret_cast<float *>(&ret));
   kernel->in(2, a);
@@ -125,7 +149,7 @@ TEST_CASE("OCL simple add float2", "[opencl]")
   kernel->run_1d(1, 1);
 
   REQUIRE( ret[0] == Approx(4) );
-  REQUIRE( ret[1] == Approx(6.6) );
+  REQUIRE( ret[1] == Approx(6.6f) );
 }
 
 // -----------------------------------------------
@@ -135,29 +159,74 @@ TEST_CASE("simple add float2", "[cpp11]")
   float2 ret;
   float2 a, b;
 
-  a = make_float2(1, 2.1);
-  b = make_float2(3, 4.5);
+  a = make_float2(1, 2.1f);
+  b = make_float2(3, 4.5f);
 
   simple_add_float2(&ret, &a, &b);
 
   REQUIRE( ret.x == Approx(4) );
-  REQUIRE( ret.y == Approx(6.6) );
+  REQUIRE( ret.y == Approx(6.6f) );
 }
 
 int main(int argc, char **argv)
 {
+  std::vector<char *> local_argv;
+
+  char *cuda_exclude_opt = nullptr;
+  char *opencl_exclude_opt = nullptr;
+
+  for (int i = 0; i < argc; i++) {
+    local_argv.push_back(argv[i]);
+  }
+
   {
     int ret = cuewInit();
     if (ret == CUEW_SUCCESS) {
       hasCUDA = true;
+
+      printf("NVCC path    : %s\n", cuewCompilerPath());
+      printf("NVCC version : %d\n", cuewCompilerVersion());
+
+      if (nvrtcVersion) {
+        int major, minor;
+        nvrtcVersion(&major, &minor);
+        std::cout << "NVRTC version : " << major << "." << minor << std::endl;
+      }
+      else {
+        // Guess in 32bit mode. NVRTC is not available on Windows/Linux 32bit.
+        std::cerr << "NVRTC not available.";
+        exit(-1123);
+      }
+    } else {
+      std::cerr << "CUDA not available." << std::endl;
+      cuda_exclude_opt = strdup("exclude:[cuda]");
+      local_argv.push_back(cuda_exclude_opt);
     }
   }
 
   {
     hasOpenCL = EasyCL::isOpenCLAvailable();
+
+    if (hasOpenCL) {
+    } else {
+      std::cerr << "OpenCL not available." << std::endl;
+      opencl_exclude_opt = strdup("exclude:[opencl]");
+      local_argv.push_back(opencl_exclude_opt);
+      
+    }
   }
 
+  int local_argc = int(local_argv.size());
   
-  int result = Catch::Session().run(argc, argv);
+  int result = Catch::Session().run(local_argc, local_argv.data());
+
+  if (cuda_exclude_opt) {
+    free(cuda_exclude_opt);
+  }
+
+  if (opencl_exclude_opt) {
+    free(opencl_exclude_opt);
+  }
+
   return ( result < 0xff ) ? result : 0xff;
 }

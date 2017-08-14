@@ -6,7 +6,16 @@
 //  (See accompanying file license.txt)
 //////////////////////////////////////////////////////////////////////////
 
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wreserved-id-macro"
+#endif
+
 #include "clew.h"
+
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
 
 #ifdef _WIN32
     #define WIN32_LEAN_AND_MEAN
