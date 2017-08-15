@@ -1,5 +1,5 @@
-#include <cstdlib>
 #include <cstdio>
+#include <cstdlib>
 
 #define CATCH_CONFIG_RUNNER
 #include "catch.hpp"
@@ -33,8 +33,8 @@
 #endif
 
 // ------------
-#include "simple_add.kernel"
 #include "alignment.kernel"
+#include "simple_add.kernel"
 // ------------
 
 using namespace Catch;
@@ -48,8 +48,7 @@ static std::string kOpenCLCompileOptions = "-I ../ -I ../../ -D OPENCL";
 static std::vector<std::string> kCUDACompileOptions = {"--include-path=../../"};
 
 #if !defined(__APPLE__)
-static std::string LoadFile(const std::string &filename)
-{
+static std::string LoadFile(const std::string &filename) {
   std::ifstream ifs(filename);
   if (!ifs) {
     std::cerr << "failed to open file : " << filename << std::endl;
@@ -73,8 +72,7 @@ static std::string LoadFile(const std::string &filename)
   return s;
 }
 
-TEST_CASE("CUDA initialize", "[cuda]")
-{
+TEST_CASE("CUDA initialize", "[cuda]") {
   auto platform = CLCudaAPI::Platform(0);
   auto device = CLCudaAPI::Device(platform, 0);
   auto context = CLCudaAPI::Context(device);
@@ -91,7 +89,8 @@ TEST_CASE("CUDA initialize", "[cuda]")
   auto build_status = program.Build(device, compiler_options);
   if (build_status != CLCudaAPI::BuildStatus::kSuccess) {
     auto message = program.GetBuildInfo(device);
-    std::cerr << " > Compiler error(s)/warning(s) found: " << std::endl << message << std::endl;
+    std::cerr << " > Compiler error(s)/warning(s) found: " << std::endl
+              << message << std::endl;
   }
   REQUIRE(build_status == CLCudaAPI::BuildStatus::kSuccess);
 
@@ -121,13 +120,11 @@ TEST_CASE("CUDA initialize", "[cuda]")
 
   dev_ret.Read(queue, 2, ret);
 
-  REQUIRE( ret[0] == Approx(4) );
-  REQUIRE( ret[1] == Approx(6.6) );
-
+  REQUIRE(ret[0] == Approx(4));
+  REQUIRE(ret[1] == Approx(6.6));
 }
 
-TEST_CASE("CUDA datasize", "[cuda]")
-{
+TEST_CASE("CUDA datasize", "[cuda]") {
   auto platform = CLCudaAPI::Platform(0);
   auto device = CLCudaAPI::Device(platform, 0);
   auto context = CLCudaAPI::Context(device);
@@ -144,7 +141,8 @@ TEST_CASE("CUDA datasize", "[cuda]")
   auto build_status = program.Build(device, compiler_options);
   if (build_status != CLCudaAPI::BuildStatus::kSuccess) {
     auto message = program.GetBuildInfo(device);
-    std::cerr << " > Compiler error(s)/warning(s) found: " << std::endl << message << std::endl;
+    std::cerr << " > Compiler error(s)/warning(s) found: " << std::endl
+              << message << std::endl;
   }
   REQUIRE(build_status == CLCudaAPI::BuildStatus::kSuccess);
 
@@ -163,19 +161,18 @@ TEST_CASE("CUDA datasize", "[cuda]")
 
   dev_ret.Read(queue, 3, ret);
 
-  REQUIRE( ret[0] == 12 );
-  REQUIRE( ret[1] == 24 );
-  REQUIRE( ret[2] == 32 );
-
+  REQUIRE(ret[0] == 12);
+  REQUIRE(ret[1] == 24);
+  REQUIRE(ret[2] == 32);
 }
 #endif
 
 // -----------------------------------------------
 
-TEST_CASE("OCL simple add vec2", "[opencl]")
-{
+TEST_CASE("OCL simple add vec2", "[opencl]") {
   EasyCL *cl = EasyCL::createForFirstGpu();
-  CLKernel *kernel = cl->buildKernel("../simple_add.kernel", "simple_add_vec2", kOpenCLCompileOptions);
+  CLKernel *kernel = cl->buildKernel("../simple_add.kernel", "simple_add_vec2",
+                                     kOpenCLCompileOptions);
   REQUIRE(kernel != nullptr);
 
   float ret[2];
@@ -193,14 +190,14 @@ TEST_CASE("OCL simple add vec2", "[opencl]")
 
   kernel->run_1d(1, 1);
 
-  REQUIRE( ret[0] == Approx(4) );
-  REQUIRE( ret[1] == Approx(6.6f) );
+  REQUIRE(ret[0] == Approx(4));
+  REQUIRE(ret[1] == Approx(6.6f));
 }
 
-TEST_CASE("OCL datasize", "[opencl]")
-{
+TEST_CASE("OCL datasize", "[opencl]") {
   EasyCL *cl = EasyCL::createForFirstGpu();
-  CLKernel *kernel = cl->buildKernel("../alignment.kernel", "alignment_test", kOpenCLCompileOptions);
+  CLKernel *kernel = cl->buildKernel("../alignment.kernel", "alignment_test",
+                                     kOpenCLCompileOptions);
   REQUIRE(kernel != nullptr);
 
   int ret[3];
@@ -209,15 +206,14 @@ TEST_CASE("OCL datasize", "[opencl]")
 
   kernel->run_1d(1, 1);
 
-  REQUIRE( ret[0] == 16 ); // sizeof(vec3)
-  REQUIRE( ret[1] == 32 ); // sizeof(Ray)
-  REQUIRE( ret[2] == 32 ); // sizeof(Ray16)
+  REQUIRE(ret[0] == 16);  // sizeof(vec3)
+  REQUIRE(ret[1] == 32);  // sizeof(Ray)
+  REQUIRE(ret[2] == 32);  // sizeof(Ray16)
 }
 
 // -----------------------------------------------
 
-TEST_CASE("simple add vec2", "[cpp11]")
-{
+TEST_CASE("simple add vec2", "[cpp11]") {
   vec2 ret;
   vec2 a, b;
 
@@ -226,19 +222,17 @@ TEST_CASE("simple add vec2", "[cpp11]")
 
   simple_add_vec2(&ret, &a, &b);
 
-  REQUIRE( ret.x == Approx(4) );
-  REQUIRE( ret.y == Approx(6.6f) );
+  REQUIRE(ret.x == Approx(4));
+  REQUIRE(ret.y == Approx(6.6f));
 }
 
-TEST_CASE("datasize", "[cpp11]")
-{
-  REQUIRE( sizeof(vec3) == 12 );
-  REQUIRE( sizeof(Ray) == 24 );
-  REQUIRE( sizeof(Ray16) == 32 );
+TEST_CASE("datasize", "[cpp11]") {
+  REQUIRE(sizeof(vec3) == 12);
+  REQUIRE(sizeof(Ray) == 24);
+  REQUIRE(sizeof(Ray16) == 32);
 }
 
-int main(int argc, char **argv)
-{
+int main(int argc, char **argv) {
   std::vector<char *> local_argv;
 
   char *cuda_exclude_opt = nullptr;
@@ -260,14 +254,13 @@ int main(int argc, char **argv)
         int major, minor;
         nvrtcVersion(&major, &minor);
         std::cout << "NVRTC version : " << major << "." << minor << std::endl;
-      }
-      else {
+      } else {
         // Guess in 32bit mode. NVRTC is not available on Windows/Linux 32bit.
         std::cerr << "NVRTC not available.";
         exit(-1123);
       }
 
-      // check if actual CUDA device is available.
+// check if actual CUDA device is available.
 #if 1
       {
         bool failed = false;
@@ -276,7 +269,6 @@ int main(int argc, char **argv)
           std::cerr << "cuInit failed." << std::endl;
           failed = true;
         } else {
-
           int num_devices = 0;
           CUresult ret = cuDeviceGetCount(&num_devices);
           if (ret != CUDA_SUCCESS) {
@@ -290,7 +282,6 @@ int main(int argc, char **argv)
             std::cerr << "CUDA capable device not available." << std::endl;
             failed = true;
           }
-
         }
 
         if (failed) {
@@ -314,12 +305,11 @@ int main(int argc, char **argv)
       std::cerr << "OpenCL not available." << std::endl;
       opencl_exclude_opt = strdup("exclude:[opencl]");
       local_argv.push_back(opencl_exclude_opt);
-      
     }
   }
 
   int local_argc = int(local_argv.size());
-  
+
   int result = Catch::Session().run(local_argc, local_argv.data());
 
   if (cuda_exclude_opt) {
@@ -330,5 +320,5 @@ int main(int argc, char **argv)
     free(opencl_exclude_opt);
   }
 
-  return ( result < 0xff ) ? result : 0xff;
+  return (result < 0xff) ? result : 0xff;
 }

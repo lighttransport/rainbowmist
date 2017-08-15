@@ -2,7 +2,8 @@
 #define RAINBOWMIST_H_
 
 //
-// RaibowMist, simple header only CUDA/OpenCL/C++11 single kernel description utility.
+// RaibowMist, simple header only CUDA/OpenCL/C++11 single kernel description
+// utility.
 //
 
 /*
@@ -45,10 +46,10 @@ THE SOFTWARE.
 #define GLM_FORCE_CUDA
 #endif
 
+#include "glm/geometric.hpp"
 #include "glm/vec2.hpp"
 #include "glm/vec3.hpp"
 #include "glm/vec4.hpp"
-#include "glm/geometric.hpp"
 
 using namespace glm;
 
@@ -59,7 +60,7 @@ using namespace glm;
 #define vcross(a, b) cross(a, b)
 #define vdot(a, b) dot(a, b)
 
-#else // !RAINBOWMIST_USE_GLM
+#else  // !RAINBOWMIST_USE_GLM
 
 // Include helper_math firstly
 #include "helper_math.h"
@@ -72,7 +73,7 @@ typedef float4 vec4;
 #define vcross(a, b) cross(a, b)
 #define vdot(a, b) dot(a, b)
 
-#endif // RAINBOWMIST_USE_GLM
+#endif  // RAINBOWMIST_USE_GLM
 
 //#include <float.h> // import FLT_EPSILON
 
@@ -81,22 +82,19 @@ typedef float4 vec4;
 #endif
 
 #define DEVICE __device__
-#define HOST   __host__
-#define GLOBAL 
-#define LOCAL 
+#define HOST __host__
+#define GLOBAL
+#define LOCAL
 #define KERNEL extern "C" __global__
 
-
-DEVICE static inline vec2 make_vec2(float a, float b)
-{
+DEVICE static inline vec2 make_vec2(float a, float b) {
   vec2 ret;
   ret.x = a;
   ret.y = b;
   return ret;
 }
 
-DEVICE static inline vec3 make_vec3(float a, float b, float c)
-{
+DEVICE static inline vec3 make_vec3(float a, float b, float c) {
   vec3 ret;
   ret.x = a;
   ret.y = b;
@@ -104,8 +102,7 @@ DEVICE static inline vec3 make_vec3(float a, float b, float c)
   return ret;
 }
 
-DEVICE static inline vec4 make_vec4(float a, float b, float c, float d)
-{
+DEVICE static inline vec4 make_vec4(float a, float b, float c, float d) {
   vec4 ret;
   ret.x = a;
   ret.y = b;
@@ -114,16 +111,17 @@ DEVICE static inline vec4 make_vec4(float a, float b, float c, float d)
   return ret;
 }
 
-#elif defined(OPENCL)  // NOTE(LTE): Application must pass `-D OPENCL` as a OpenCL compile flags.
+#elif defined(OPENCL)  // NOTE(LTE): Application must pass `-D OPENCL` as a
+                       // OpenCL compile flags.
 
 // We only support OpenCL 1.2
 
 #define RAINBOWMIST_OPENCL (1)
 
-#define DEVICE 
+#define DEVICE
 #define KERNEL __kernel
 #define GLOBAL __global
-#define LOCAL  __local
+#define LOCAL __local
 
 #define vnormalize(x) normalize(x)
 #define vcross(a, b) cross(a, b)
@@ -139,23 +137,18 @@ typedef float3 vec3;
 typedef float4 vec4;
 
 #if !defined(__APPLE__)
-static inline vec2 make_vec2(float a, float b)
-{
-  return (vec2)(a, b);
-}
+static inline vec2 make_vec2(float a, float b) { return (vec2)(a, b); }
 
-static inline vec3 make_vec3(float a, float b, float c)
-{
+static inline vec3 make_vec3(float a, float b, float c) {
   return (float3)(a, b, c);
 }
 
-static inline vec4 make_vec4(float a, float b, float c, float d)
-{
+static inline vec4 make_vec4(float a, float b, float c, float d) {
   return (float4)(a, b, c, d);
 }
 #endif
 
-#else // C++
+#else  // C++
 
 #define RAINBOWMIST_CPP11 (1)
 
@@ -172,8 +165,8 @@ static inline vec4 make_vec4(float a, float b, float c, float d)
 #define GLM_FORCE_SWIZZLE
 #endif
 
-#include "glm/glm.hpp"
 #include "glm/geometric.hpp"
+#include "glm/glm.hpp"
 
 #ifdef __clang__
 #pragma clang diagnostic push
@@ -186,7 +179,7 @@ using namespace glm;
 #pragma clang diagnostic pop
 #endif
 
-#else // !RAINBOWMIST_USE_GLM
+#else  // !RAINBOWMIST_USE_GLM
 
 // Use CxxSwizzle.
 #ifdef __clang__
@@ -207,7 +200,7 @@ typedef swizzle::glsl::vector<float, 3> vec3;
 typedef swizzle::glsl::vector<float, 4> vec4;
 
 // ----------------------------------------------------
-#endif // RAINBOWMIST_USE_GLM
+#endif  // RAINBOWMIST_USE_GLM
 
 // TODO(LTE): Implement more stuff.
 #define vnormalize(x) normalize(x)
@@ -218,21 +211,18 @@ typedef swizzle::glsl::vector<float, 4> vec4;
 // - No shared variable support
 
 #define KERNEL static
-#define DEVICE 
-#define GLOBAL 
+#define DEVICE
+#define GLOBAL
 #define SHARED ERROR
 
-
-static inline vec2 make_vec2(float a, float b)
-{
+static inline vec2 make_vec2(float a, float b) {
   vec2 ret;
   ret.x = a;
   ret.y = b;
   return ret;
 }
 
-static inline vec3 make_vec3(float a, float b, float c)
-{
+static inline vec3 make_vec3(float a, float b, float c) {
   vec3 ret;
   ret.x = a;
   ret.y = b;
@@ -240,8 +230,7 @@ static inline vec3 make_vec3(float a, float b, float c)
   return ret;
 }
 
-static inline vec4 make_vec4(float a, float b, float c, float d)
-{
+static inline vec4 make_vec4(float a, float b, float c, float d) {
   vec4 ret;
   ret.x = a;
   ret.y = b;
@@ -250,6 +239,6 @@ static inline vec4 make_vec4(float a, float b, float c, float d)
   return ret;
 }
 
-#endif 
+#endif
 
-#endif // RAINBOWMIST_H_
+#endif  // RAINBOWMIST_H_
