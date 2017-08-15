@@ -6,8 +6,22 @@ typedef struct _Ray
     vec3 direction;
 } Ray;
 
+typedef struct _Ray16
+{
+    vec3 origin;
+#if !defined(RAINBOWMIST_OPENCL)
+    float pad0;
+#endif
+    vec3 direction;
+#if !defined(RAINBOWMIST_OPENCL)
+    float pad1;
+#endif
+} Ray16;
+
+
 KERNEL void alignment_test(GLOBAL int *ret)
 {
   ret[0] = sizeof(vec3);
   ret[1] = sizeof(Ray);
+  ret[2] = sizeof(Ray16);
 }

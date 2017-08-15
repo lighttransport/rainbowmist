@@ -44,7 +44,8 @@ static bool hasCUDA = false;
 static bool hasOpenCL = false;
 
 static std::string kOpenCLCompileOptions = "-I ../ -I ../../ -D OPENCL";
-static std::string kCUDACompileOptions = "--include-path=../../";
+
+static std::vector<std::string> kCUDACompileOptions = {"--include-path=../../"};
 
 #if !defined(__APPLE__)
 static std::string LoadFile(const std::string &filename)
@@ -86,7 +87,7 @@ TEST_CASE("CUDA initialize", "[cuda]")
 
   auto program = CLCudaAPI::Program(context, std::move(program_string));
   std::vector<std::string> compiler_options;
-  compiler_options.push_back(kCUDACompileOptions);
+  compiler_options = kCUDACompileOptions;
   auto build_status = program.Build(device, compiler_options);
   if (build_status != CLCudaAPI::BuildStatus::kSuccess) {
     auto message = program.GetBuildInfo(device);
@@ -139,7 +140,7 @@ TEST_CASE("CUDA datasize", "[cuda]")
 
   auto program = CLCudaAPI::Program(context, std::move(program_string));
   std::vector<std::string> compiler_options;
-  compiler_options.push_back(kCUDACompileOptions);
+  compiler_options = kCUDACompileOptions;
   auto build_status = program.Build(device, compiler_options);
   if (build_status != CLCudaAPI::BuildStatus::kSuccess) {
     auto message = program.GetBuildInfo(device);
@@ -147,9 +148,9 @@ TEST_CASE("CUDA datasize", "[cuda]")
   }
   REQUIRE(build_status == CLCudaAPI::BuildStatus::kSuccess);
 
-  int ret[2];
+  int ret[3];
 
-  auto dev_ret = CLCudaAPI::Buffer<int>(context, queue, ret, ret + 2);
+  auto dev_ret = CLCudaAPI::Buffer<int>(context, queue, ret, ret + 3);
 
   auto kernel = CLCudaAPI::Kernel(program, "alignment_test");
   kernel.SetArgument(0, dev_ret);
@@ -160,10 +161,11 @@ TEST_CASE("CUDA datasize", "[cuda]")
   kernel.Launch(queue, global, local, event.pointer());
   queue.Finish(event);
 
-  dev_ret.Read(queue, 2, ret);
+  dev_ret.Read(queue, 3, ret);
 
-  REQUIRE( ret[0] == 16 );
-  REQUIRE( ret[1] == 32 );
+  REQUIRE( ret[0] == 12 );
+  REQUIRE( ret[1] == 24 );
+  REQUIRE( ret[2] == 32 );
 
 }
 #endif
@@ -201,14 +203,15 @@ TEST_CASE("OCL datasize", "[opencl]")
   CLKernel *kernel = cl->buildKernel("../alignment.kernel", "alignment_test", kOpenCLCompileOptions);
   REQUIRE(kernel != nullptr);
 
-  int ret[2];
+  int ret[3];
 
-  kernel->out(2, reinterpret_cast<int *>(&ret));
+  kernel->out(3, reinterpret_cast<int *>(&ret));
 
   kernel->run_1d(1, 1);
 
   REQUIRE( ret[0] == 16 ); // sizeof(vec3)
   REQUIRE( ret[1] == 32 ); // sizeof(Ray)
+  REQUIRE( ret[2] == 32 ); // sizeof(Ray16)
 }
 
 // -----------------------------------------------
@@ -231,6 +234,7 @@ TEST_CASE("datasize", "[cpp11]")
 {
   REQUIRE( sizeof(vec3) == 12 );
   REQUIRE( sizeof(Ray) == 24 );
+  REQUIRE( sizeof(Ray16) == 32 );
 }
 
 int main(int argc, char **argv)
@@ -264,15 +268,37 @@ int main(int argc, char **argv)
       }
 
       // check if actual CUDA device is available.
-      int num_devices = 0;
-      cuDeviceGetCount(&num_devices);
-      std::cout << "# of CUDA devices : " << num_devices << std::endl;
+#if 1
+      {
+        bool failed = false;
 
-      if (num_devices == 0) {
-        std::cerr << "CUDA capable device not available." << std::endl;
-        cuda_exclude_opt = strdup("exclude:[cuda]");
-        local_argv.push_back(cuda_exclude_opt);
+        if (CUDA_SUCCESS != cuInit(0)) {
+          std::cerr << "cuInit failed." << std::endl;
+          failed = true;
+        } else {
+
+          int num_devices = 0;
+          CUresult ret = cuDeviceGetCount(&num_devices);
+          if (ret != CUDA_SUCCESS) {
+            std::cerr << "cuDeviceGetCound err : " << ret << std::endl;
+            failed = true;
+          }
+
+          std::cout << "# of CUDA devices : " << num_devices << std::endl;
+
+          if (num_devices == 0) {
+            std::cerr << "CUDA capable device not available." << std::endl;
+            failed = true;
+          }
+
+        }
+
+        if (failed) {
+          cuda_exclude_opt = strdup("exclude:[cuda]");
+          local_argv.push_back(cuda_exclude_opt);
+        }
       }
+#endif
     } else {
       std::cerr << "CUDA not available." << std::endl;
       cuda_exclude_opt = strdup("exclude:[cuda]");
