@@ -87,7 +87,7 @@ typedef float4 vec4;
 #define KERNEL extern "C" __global__
 
 
-static inline vec2 make_vec2(float a, float b)
+DEVICE static inline vec2 make_vec2(float a, float b)
 {
   vec2 ret;
   ret.x = a;
@@ -95,7 +95,7 @@ static inline vec2 make_vec2(float a, float b)
   return ret;
 }
 
-static inline vec3 make_vec3(float a, float b, float c)
+DEVICE static inline vec3 make_vec3(float a, float b, float c)
 {
   vec3 ret;
   ret.x = a;
@@ -104,7 +104,7 @@ static inline vec3 make_vec3(float a, float b, float c)
   return ret;
 }
 
-static inline vec4 make_vec4(float a, float b, float c, float d)
+DEVICE static inline vec4 make_vec4(float a, float b, float c, float d)
 {
   vec4 ret;
   ret.x = a;
