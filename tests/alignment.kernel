@@ -1,0 +1,13 @@
+#include "rainbowmist.h"
+
+typedef struct _Ray
+{
+    vec3 origin;
+    vec3 direction;
+} Ray;
+
+KERNEL void alignment_test(GLOBAL int *ret)
+{
+  ret[0] = sizeof(vec3);
+  ret[1] = sizeof(Ray);
+}

@@ -34,6 +34,7 @@
 
 // ------------
 #include "simple_add.kernel"
+#include "alignment.kernel"
 // ------------
 
 using namespace Catch;
@@ -71,7 +72,7 @@ static std::string LoadFile(const std::string &filename)
   return s;
 }
 
-TEST_CASE("CUDA initialize", "[cuda][!mayfail]")
+TEST_CASE("CUDA initialize", "[cuda]")
 {
   auto platform = CLCudaAPI::Platform(0);
   auto device = CLCudaAPI::Device(platform, 0);
@@ -123,6 +124,48 @@ TEST_CASE("CUDA initialize", "[cuda][!mayfail]")
   REQUIRE( ret[1] == Approx(6.6) );
 
 }
+
+TEST_CASE("CUDA datasize", "[cuda]")
+{
+  auto platform = CLCudaAPI::Platform(0);
+  auto device = CLCudaAPI::Device(platform, 0);
+  auto context = CLCudaAPI::Context(device);
+  auto queue = CLCudaAPI::Queue(context, device);
+  auto event = CLCudaAPI::Event();
+
+  std::string program_string = LoadFile("../alignment.kernel");
+  std::cout << program_string << std::endl;
+  REQUIRE(!program_string.empty());
+
+  auto program = CLCudaAPI::Program(context, std::move(program_string));
+  std::vector<std::string> compiler_options;
+  compiler_options.push_back(kCUDACompileOptions);
+  auto build_status = program.Build(device, compiler_options);
+  if (build_status != CLCudaAPI::BuildStatus::kSuccess) {
+    auto message = program.GetBuildInfo(device);
+    std::cerr << " > Compiler error(s)/warning(s) found: " << std::endl << message << std::endl;
+  }
+  REQUIRE(build_status == CLCudaAPI::BuildStatus::kSuccess);
+
+  int ret[2];
+
+  auto dev_ret = CLCudaAPI::Buffer<int>(context, queue, ret, ret + 2);
+
+  auto kernel = CLCudaAPI::Kernel(program, "alignment_test");
+  kernel.SetArgument(0, dev_ret);
+
+  std::vector<size_t> global(1, 1);
+  std::vector<size_t> local(1, 1);
+
+  kernel.Launch(queue, global, local, event.pointer());
+  queue.Finish(event);
+
+  dev_ret.Read(queue, 2, ret);
+
+  REQUIRE( ret[0] == 16 );
+  REQUIRE( ret[1] == 32 );
+
+}
 #endif
 
 // -----------------------------------------------
@@ -152,6 +195,22 @@ TEST_CASE("OCL simple add vec2", "[opencl]")
   REQUIRE( ret[1] == Approx(6.6f) );
 }
 
+TEST_CASE("OCL datasize", "[opencl]")
+{
+  EasyCL *cl = EasyCL::createForFirstGpu();
+  CLKernel *kernel = cl->buildKernel("../alignment.kernel", "alignment_test", kOpenCLCompileOptions);
+  REQUIRE(kernel != nullptr);
+
+  int ret[2];
+
+  kernel->out(2, reinterpret_cast<int *>(&ret));
+
+  kernel->run_1d(1, 1);
+
+  REQUIRE( ret[0] == 16 ); // sizeof(vec3)
+  REQUIRE( ret[1] == 32 ); // sizeof(Ray)
+}
+
 // -----------------------------------------------
 
 TEST_CASE("simple add vec2", "[cpp11]")
@@ -166,6 +225,12 @@ TEST_CASE("simple add vec2", "[cpp11]")
 
   REQUIRE( ret.x == Approx(4) );
   REQUIRE( ret.y == Approx(6.6f) );
+}
+
+TEST_CASE("datasize", "[cpp11]")
+{
+  REQUIRE( sizeof(vec3) == 12 );
+  REQUIRE( sizeof(Ray) == 24 );
 }
 
 int main(int argc, char **argv)
