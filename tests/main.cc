@@ -227,9 +227,15 @@ TEST_CASE("simple add vec2", "[cpp11]") {
 }
 
 TEST_CASE("datasize", "[cpp11]") {
-  REQUIRE(sizeof(vec3) == 12);
-  REQUIRE(sizeof(Ray) == 24);
-  REQUIRE(sizeof(Ray16) == 32);
+
+  int ret[3];
+
+  alignment_test(ret);
+
+  REQUIRE(ret[0] == 12);
+  REQUIRE(ret[1] == 24);
+  REQUIRE(ret[2] == 32);
+
 }
 
 int main(int argc, char **argv) {
@@ -270,9 +276,9 @@ int main(int argc, char **argv) {
           failed = true;
         } else {
           int num_devices = 0;
-          CUresult ret = cuDeviceGetCount(&num_devices);
-          if (ret != CUDA_SUCCESS) {
-            std::cerr << "cuDeviceGetCound err : " << ret << std::endl;
+          CUresult cu_ret = cuDeviceGetCount(&num_devices);
+          if (cu_ret != CUDA_SUCCESS) {
+            std::cerr << "cuDeviceGetCound err : " << cu_ret << std::endl;
             failed = true;
           }
 
