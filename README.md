@@ -1,6 +1,6 @@
-# RainbowMist 🌈🌫️, header only OpenCL/CUDA/C++11 single compute kernel description utility.
+# RainbowMist 🌈🌫️, header only OpenCL/CUDA/C++11 single compute kernel descripion utility.
 
-RainbowMist 🌈🌫️ is a simple macro and template based single compute kernel.
+RainbowMist 🌈🌫️ is a simple C++  macro and template based single compute kernel utility.
 
 ## Status
 
@@ -22,7 +22,7 @@ RainbowMist 🌈🌫️ is a simple macro and template based single compute kern
 
 * Easy to maintain your compute kenerl code among CUDA/OpenCL/C++11.
 * Easy to adapt to your application.
-* (Rathe) Easy to debug in source code level
+* (Rather) Easy to debug in source code level
 
 ## Disadvantage
 
@@ -67,13 +67,16 @@ $ cmake -Bbuild -H. -G "Visual Studio 14 2015 Win64"
 ## TODO
 
 * [ ] OpenGL GLSL compute shader?
+* [ ] Implement more builtin functions, math functions.
+* [ ] Swizzle without glm.
+* [ ] Common API to call Kernel function.
 
 ## Third party licenses
 
 * helper_math.h : Copyright 1993-2013 NVIDIA Corporation.  All rights reserved.
 * glm : Happy Bunny License (Modified MIT) or the MIT License
-* Catch : 
-* EasyCL
-* clew
-* cuew
+* Catch : Boost license.
+* EasyCL : Copyright (c) Hugh Perkins 2013, hughperkins at gmail. MPL license.
+* clew :
+* cuew : Modified Apache 2.0 License.
 

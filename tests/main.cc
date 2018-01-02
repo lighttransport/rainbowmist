@@ -244,66 +244,88 @@ int main(int argc, char **argv) {
   char *cuda_exclude_opt = nullptr;
   char *opencl_exclude_opt = nullptr;
 
+  bool runCUDA = true;
+  bool runOpenCL = true;
+
   for (int i = 0; i < argc; i++) {
     local_argv.push_back(argv[i]);
-  }
 
-  {
-    int ret = cuewInit();
-    if (ret == CUEW_SUCCESS) {
-      hasCUDA = true;
-
-      printf("NVCC path    : %s\n", cuewCompilerPath());
-      printf("NVCC version : %d\n", cuewCompilerVersion());
-
-      if (nvrtcVersion) {
-        int major, minor;
-        nvrtcVersion(&major, &minor);
-        std::cout << "NVRTC version : " << major << "." << minor << std::endl;
-      } else {
-        // Guess in 32bit mode. NVRTC is not available on Windows/Linux 32bit.
-        std::cerr << "NVRTC not available.";
-        exit(-1123);
-      }
-
-// check if actual CUDA device is available.
-#if 1
-      {
-        bool failed = false;
-
-        if (CUDA_SUCCESS != cuInit(0)) {
-          std::cerr << "cuInit failed." << std::endl;
-          failed = true;
-        } else {
-          int num_devices = 0;
-          CUresult cu_ret = cuDeviceGetCount(&num_devices);
-          if (cu_ret != CUDA_SUCCESS) {
-            std::cerr << "cuDeviceGetCound err : " << cu_ret << std::endl;
-            failed = true;
-          }
-
-          std::cout << "# of CUDA devices : " << num_devices << std::endl;
-
-          if (num_devices == 0) {
-            std::cerr << "CUDA capable device not available." << std::endl;
-            failed = true;
-          }
-        }
-
-        if (failed) {
-          cuda_exclude_opt = strdup("exclude:[cuda]");
-          local_argv.push_back(cuda_exclude_opt);
-        }
-      }
-#endif
-    } else {
-      std::cerr << "CUDA not available." << std::endl;
-      cuda_exclude_opt = strdup("exclude:[cuda]");
-      local_argv.push_back(cuda_exclude_opt);
+    std::cout << argv[i] << std::endl;
+    if (strcmp("exclude:[cuda]", argv[i]) == 0) {
+      runCUDA = false;
+    }
+    if (strcmp("exclude:[opencl]", argv[i]) == 0) {
+      runCUDA = false;
     }
   }
 
-  {
+  if (runCUDA) {
+    // NOTE: `cuewInit()` may seg fault on some situation even when using try-catch exception handling.
+    // (e.g. installing cuda toolkit on Intel or AMD only GPU devices)
+    std::cout << "Initialize CUDA(You can skip CUDA test using `exclude:[cuda]' argument if you face a CUDA initialization problem)." << std::endl;
+    std::cout << std::flush;
+    try {
+      int ret = cuewInit();
+      if (ret == CUEW_SUCCESS) {
+        hasCUDA = true;
+
+        printf("NVCC path    : %s\n", cuewCompilerPath());
+        printf("NVCC version : %d\n", cuewCompilerVersion());
+
+        if (nvrtcVersion) {
+          int major, minor;
+          nvrtcVersion(&major, &minor);
+          std::cout << "NVRTC version : " << major << "." << minor << std::endl;
+        } else {
+          // Guess in 32bit mode. NVRTC is not available on Windows/Linux 32bit.
+          std::cerr << "NVRTC not available.";
+          exit(-1123);
+        }
+
+        // check if actual CUDA device is available.
+        {
+          bool failed = false;
+
+          if (CUDA_SUCCESS != cuInit(0)) {
+            std::cerr << "cuInit failed." << std::endl;
+            failed = true;
+          } else {
+            int num_devices = 0;
+            CUresult cu_ret = cuDeviceGetCount(&num_devices);
+            if (cu_ret != CUDA_SUCCESS) {
+              std::cerr << "cuDeviceGetCound err : " << cu_ret << std::endl;
+              failed = true;
+            }
+
+            std::cout << "# of CUDA devices : " << num_devices << std::endl;
+
+            if (num_devices == 0) {
+              std::cerr << "CUDA capable device not available." << std::endl;
+              failed = true;
+            }
+          }
+
+          if (failed) {
+            cuda_exclude_opt = strdup("exclude:[cuda]");
+            local_argv.push_back(cuda_exclude_opt);
+          }
+        }
+      } else {
+        std::cerr << "CUDA not available." << std::endl;
+        cuda_exclude_opt = strdup("exclude:[cuda]");
+        local_argv.push_back(cuda_exclude_opt);
+      }
+    } catch(std::exception &e) {
+      std::cerr << "Failed to Initialize CUDA. reason = " << e.what() << std::endl;
+      cuda_exclude_opt = strdup("exclude:[cuda]");
+      local_argv.push_back(cuda_exclude_opt);
+    }
+  } else {
+    std::cout << "Skip testing with CUDA code path..." << std::endl;
+  }
+
+  if (runOpenCL) {
+    std::cout << "Initialize OpenCL(You can skip OpenCL test using `exclude:[opencl]' argument if you face a OpenCL initialization problem)." << std::endl;
     hasOpenCL = EasyCL::isOpenCLAvailable();
 
     if (hasOpenCL) {
@@ -312,6 +334,8 @@ int main(int argc, char **argv) {
       opencl_exclude_opt = strdup("exclude:[opencl]");
       local_argv.push_back(opencl_exclude_opt);
     }
+  } else {
+    std::cout << "Skip running tests of OpenCL code path..." << std::endl;
   }
 
   int local_argc = int(local_argv.size());

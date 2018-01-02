@@ -3,7 +3,6 @@ cmake_minimum_required(VERSION 3.5.1)
 project(UnitTests)
 
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
-find_package(Sanitizers) # Address sanitizer.
 
 if (NOT IS_DIRECTORY "${CMAKE_SOURCE_DIR}/../third_party/Catch/include")
   message(FATAL_ERROR "RainbowMist dependency repositories (Catch, etc.) are missing! "
@@ -58,7 +57,7 @@ message("Lucia: Current build type is : ${CMAKE_BUILD_TYPE}")
 set (CMAKE_CXX_STANDARD 11)
 
 # Sanitizer
-find_package(Sanitizers)
+# find_package(Sanitizers)
 
 # Threads
 find_package(Threads)
@@ -67,7 +66,7 @@ find_package(Threads)
 include_directories("${CMAKE_SOURCE_DIR}/../third_party/glm/include")
 
 # [CxxSwizzle]
-include_directories("${CMAKE_SOURCE_DIR}/../third_party/CxxSwizzle/include")
+#include_directories("${CMAKE_SOURCE_DIR}/../third_party/CxxSwizzle/include")
 
 # [CLCudaAPI]
 include_directories("${CMAKE_SOURCE_DIR}/CLCudaAPI/include")
@@ -152,4 +151,7 @@ endif()
 set(EXTRA_LIBS ${EXTRA_LIBS} EasyCL clew cuew)
 
 target_link_libraries(unit_test ${EXTRA_LIBS} ${CMAKE_THREAD_LIBS_INIT} ${CMAKE_DL_LIBS})
-add_sanitizers(unit_test)
+
+# We cannot mix CUDA(NVRTC) + ASAN(= seg fault), so disable ASAN for a while.
+# TODO(LTE): Only enable ASAN when we compile codes without CUDA.
+# add_sanitizers(unit_test)
