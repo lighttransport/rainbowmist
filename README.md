@@ -40,7 +40,7 @@ RAINBOWMIST_CPP11   : defined when compiling code with C++11
 ## Setup
 
 ```
-$ git submodule update --init
+$ git submodule update --init --depth 1
 ```
 
 ## Running tests
@@ -63,6 +63,10 @@ Tested on Visual Studio 2015 or later.
 $ cd tests
 $ cmake -Bbuild -H. -G "Visual Studio 14 2015 Win64"
 ```
+
+## Limitation
+
+`not` operator is not available in C++11(since `not` is a reserved keyword).
 
 ## TODO
 

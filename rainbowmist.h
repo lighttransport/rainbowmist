@@ -9,7 +9,7 @@
 /*
 The MIT License (MIT)
 
-Copyright (c) 2017 - present Light Transport Entertainment, Inc.
+Copyright (c) 2017 - 2020 Light Transport Entertainment, Inc.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -204,7 +204,7 @@ static inline vec4 make_vec4(float a, float b, float c, float d) {
 #define RAINBOWMIST_USE_GLM (0)
 #endif
 
-#ifdef RAINBOWMIST_USE_GLM
+#if RAINBOWMIST_USE_GLM
 
 #ifndef GLM_FORCE_SWIZZLE
 #define GLM_FORCE_SWIZZLE
