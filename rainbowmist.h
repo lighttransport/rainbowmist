@@ -86,39 +86,39 @@ typedef uint4  uvec4;
 #endif
 
 // Function modifiers
-#define DEVICE __device__
-#define KERNEL extern "C" __global__
-#define HOST __host__
+#define RM_DEVICE __device__
+#define RM_KERNEL extern "C" __global__
+#define RM_HOST __host__
 // Variable modifiers
-#define GLOBAL
-#define LOCAL __shared__
-#define CONST __constant__
-#define PRIVATE
+#define RM_GLOBAL
+#define RM_LOCAL __shared__
+#define RM_CONST __constant__
+#define RM_PRIVATE
 
-#define STATIC_CAST(t, x) (t)(x)
+#define RM_STATIC_CAST(t, x) (t)(x)
 
-DEVICE static inline uvec3 GlobalId() {
+RM_DEVICE static inline uvec3 GlobalId() {
   return make_uint3(blockDim.x * blockIdx.x + threadIdx.x,
                blockDim.y * blockIdx.y + threadIdx.y,
                blockDim.z * blockIdx.z + threadIdx.z);
 }
 
-DEVICE static inline vec2 mix(vec2 x, vec2 y, float a) {
+RM_DEVICE static inline vec2 mix(vec2 x, vec2 y, float a) {
   return x + (y - x) * a;
 }
 
-DEVICE static inline vec2 mix(vec2 x, vec2 y, vec2 a) {
+RM_DEVICE static inline vec2 mix(vec2 x, vec2 y, vec2 a) {
   return x + (y - x) * a;
 }
 
-DEVICE static inline vec2 make_vec2(float a, float b) {
+RM_DEVICE static inline vec2 make_vec2(float a, float b) {
   vec2 ret;
   ret.x = a;
   ret.y = b;
   return ret;
 }
 
-DEVICE static inline vec3 make_vec3(float a, float b, float c) {
+RM_DEVICE static inline vec3 make_vec3(float a, float b, float c) {
   vec3 ret;
   ret.x = a;
   ret.y = b;
@@ -126,7 +126,7 @@ DEVICE static inline vec3 make_vec3(float a, float b, float c) {
   return ret;
 }
 
-DEVICE static inline vec4 make_vec4(float a, float b, float c, float d) {
+RM_DEVICE static inline vec4 make_vec4(float a, float b, float c, float d) {
   vec4 ret;
   ret.x = a;
   ret.y = b;
@@ -148,16 +148,16 @@ DEVICE static inline vec4 make_vec4(float a, float b, float c, float d) {
 #define nullptr (0)
 
 // Function modifiers
-#define DEVICE
-#define KERNEL __kernel
-#define HOST __host__
+#define RM_DEVICE
+#define RM_KERNEL __kernel
+#define RM_HOST __host__
 // Variable modifiers
-#define GLOBAL __global
-#define LOCAL __local
-#define CONST __constant
-#define PRIVATE __private
+#define RM_GLOBAL __global
+#define RM_LOCAL __local
+#define RM_CONST __constant
+#define RM_PRIVATE __private
 
-#define STATIC_CAST(t, x) (t)(x)
+#define RM_STATIC_CAST(t, x) (t)(x)
 
 typedef float2 vec2;
 typedef float3 vec3;
@@ -269,16 +269,16 @@ typedef swizzle::glsl::vector<unsigned int, 4> uvec4;
 #define vmix(x, y, a) mix(x, y, a)
 
 // Function modifiers
-#define DEVICE
-#define KERNEL
-#define HOST
+#define RM_DEVICE
+#define RM_KERNEL
+#define RM_HOST
 // Variable modifiers
-#define GLOBAL
-#define LOCAL
-#define CONST const
-#define PRIVATE
+#define RM_GLOBAL
+#define RM_LOCAL
+#define RM_CONST const
+#define RM_PRIVATE
 
-#define STATIC_CAST(t, x) static_cast<t>(x)
+#define RM_STATIC_CAST(t, x) static_cast<t>(x)
 
 // Global id mechanism for C++11 mode.
 // In c++ mode, a kernel function must be called in a loop.

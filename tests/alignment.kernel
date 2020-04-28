@@ -19,7 +19,7 @@ typedef struct _Ray16
 } Ray16;
 
 
-KERNEL void alignment_test(GLOBAL int *ret)
+RM_KERNEL void alignment_test(RM_GLOBAL int *ret)
 {
   ret[0] = sizeof(vec3);
   ret[1] = sizeof(Ray);

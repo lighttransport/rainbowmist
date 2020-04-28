@@ -1,6 +1,6 @@
 #include "rainbowmist.h"
 
-KERNEL void simple_add_vec2(GLOBAL vec2 *ret, GLOBAL const vec2 *a, GLOBAL const vec2 *b)
+RM_KERNEL void simple_add_vec2(RM_GLOBAL vec2 *ret, RM_GLOBAL const vec2 *a, RM_GLOBAL const vec2 *b)
 {
   ret[0] = a[0] + b[0];
 }

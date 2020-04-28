@@ -66,7 +66,7 @@ find_package(Threads)
 include_directories("${CMAKE_SOURCE_DIR}/../third_party/glm/include")
 
 # [CxxSwizzle]
-#include_directories("${CMAKE_SOURCE_DIR}/../third_party/CxxSwizzle/include")
+include_directories("${CMAKE_SOURCE_DIR}/../third_party/CxxSwizzle/include")
 
 # [CLCudaAPI]
 include_directories("${CMAKE_SOURCE_DIR}/CLCudaAPI/include")
