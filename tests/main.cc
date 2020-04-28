@@ -265,7 +265,7 @@ int main(int argc, char **argv) {
     std::cout << "Initialize CUDA(You can skip CUDA test using `exclude:[cuda]' argument if you face a CUDA initialization problem)." << std::endl;
     std::cout << std::flush;
     try {
-      int ret = cuewInit();
+      int ret = cuewInit(CUEW_INIT_CUDA | CUEW_INIT_NVRTC);
       if (ret == CUEW_SUCCESS) {
         hasCUDA = true;
 

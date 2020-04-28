@@ -1,6 +1,6 @@
-# RainbowMist 🌈🌫️, header only OpenCL/CUDA/C++11 single compute kernel descripion utility.
+# RainbowMist 🌈🌫️, header only OpenCL/CUDA/C++11 unified compute kernel descripion utility.
 
-RainbowMist 🌈🌫️ is a simple C++ macro and template based single compute kernel utility.
+RainbowMist 🌈🌫️ is a simple C++ macro and template based unified compute kernel utility.
 
 Write and debug your kernel in C++11, then run it on GPU(OpenCL/CUDA).
 
@@ -24,6 +24,17 @@ Write and debug your kernel in C++11, then run it on GPU(OpenCL/CUDA).
 * C++11 compiler
 
 RainbowMist uses cuew(CUDA wrangler wrapper)/nvrtc and clew(OpenCL wrangler wrapper) and does not require neither CUDA SDK nor OpenCL SDK when compiling.
+
+## How it works
+
+### CUDA backend
+
+RainbowMist runs a kernel using CLCudaAPI and cuew to run it on CUDA device.
+For CUDA environment, it uses NVRTC(Runtime compilation) feature to compile a kernel at the runtime. NVRTC was introduced from CUDA 7.0, so it should be veryu mature in these days(CUDA 9.x or 10.x is a mainstream version as of 2020 April)
+
+### OpenCL backend
+
+RainbowMist runs a kernel using CLCudaAPI or EasyCL and clew to run it on OpenCL device.
 
 ## Advantages
 
@@ -73,11 +84,12 @@ $ cmake -Bbuild -H. -G "Visual Studio 14 2015 Win64"
 
 ## Limitation
 
-`not` operator is not available in C++11(since `not` is a reserved keyword).
+`not` operator is not available in C++11 backend(since `not` is a reserved keyword in C++).
 
 ## TODO
 
-* [ ] OpenGL GLSL compute shader?
+* [ ] Write more examples.
+* [ ] OpenGL/Vulkan compute shader backend?
 * [ ] Implement more builtin functions, math functions.
 * [x] Swizzle without glm.
   * CxxSwizle
@@ -90,6 +102,6 @@ $ cmake -Bbuild -H. -G "Visual Studio 14 2015 Win64"
 * glm : Happy Bunny License (Modified MIT) or the MIT License
 * Catch : Boost license.
 * EasyCL : Copyright (c) Hugh Perkins 2013, hughperkins at gmail. MPL license.
-* clew :
-* cuew : Modified Apache 2.0 License.
+* clew : MIT license. https://github.com/OpenCLWrangler/clew
+* cuew(CUDA 10.2 ready) : Modified Apache 2.0 License. https://github.com/syoyo/cuew
 
