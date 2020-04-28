@@ -16,7 +16,9 @@ Write and debug your kernel in C++11, then run it on GPU(OpenCL/CUDA).
 
 ## Supported platforms
 
-* CUDA 8.0(7.0 or 7.5 may work but not tested)
+* CUDA 8.0 or later
+  * 7.0 or 7.5 may work but not tested
+  * CUDA 9.2 or later recommended
 * OpenCL 1.2
 
 ## Requirements
@@ -85,6 +87,15 @@ $ cmake -Bbuild -H. -G "Visual Studio 14 2015 Win64"
 ## Limitation
 
 `not` operator is not available in C++11 backend(since `not` is a reserved keyword in C++).
+
+### Data alignment
+
+You must be careful about the byte alignment and byte size of vector data type(e.g. `vec3`).
+For OpenCL backend, `vec3` will be aligned to 16 bytes and have 16 bytes of its data.
+C++11 and CUDA has 12 bytes of its data and may be aligned to 4, 8, 12 or 16 bytes.
+
+Thus to use same data layout among C++11/CUDA/OpenCL, you'll need to add extra pad variables for C++11 and CUDA.
+See [](tests/alignment.kernel) for details.
 
 ## TODO
 
